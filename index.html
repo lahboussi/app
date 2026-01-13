@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Student Monthly Average</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="topbar">
@@ -15,18 +15,18 @@
 
     <div class="title-area">
       <!-- Big editable title; change text in HTML or later (keeps simple) -->
-      <h1 id="main-title" contenteditable="true" title="Click to edit title">Student Monthly Average</h1>
+      <h1 id="main-title" contenteditable="true" title="Click to edit title">تقويم طالب العلم</h1>
     </div>
 
     <div class="right">
       <!-- Three boxes: one, two, three -->
-      <input id="studentName" class="top-input" placeholder="one (student name)" />
-      <input id="monthName" class="top-input" placeholder="two (month)" />
-      <input id="teacherName" class="top-input" placeholder="three (teacher)" />
+      <input id="studentName" class="top-input" placeholder="اسم و لقب الطالب" />
+      <input id="monthName" class="top-input" placeholder="الشهر" />
+      <input id="teacherName" class="top-input" placeholder="الشيخ" />
 
       <div class="top-buttons">
-        <button id="openBtn">Open a student ave</button>
-        <button id="saveBtn">Save Student</button>
+        <button id="openBtn">فتح نقاط الطالب</button>
+        <button id="saveBtn">حفظ بيانات الطالب</button>
         <input id="fileInput" type="file" accept="application/json" style="display:none" />
       </div>
     </div>
@@ -41,22 +41,22 @@
     <!-- Extra tables: Required 6 and Required 7 -->
     <section class="extras">
       <div class="extra-card">
-        <h3>Required 6</h3>
+        <h3>السّرد</h3>
         <div class="req6">
-          <label>Required 6 label</label>
-          <input id="req6_mark" class="small-input" placeholder="mark" />
+          <label>Required 6 label rls</label>
+          <input id="req6_mark" class="small-input" placeholder="النّقطة" />
         </div>
       </div>
 
       <div class="extra-card">
-        <h3>Required 7 (4 marks)</h3>
+        <h3>الخدمة (يوم في الاسبوع)</h3>
         <div class="req7">
           <label>Required 7 label</label>
           <div class="req7-marks">
-            <input data-req7="0" class="small-input" placeholder="mark 1" />
-            <input data-req7="1" class="small-input" placeholder="mark 2" />
-            <input data-req7="2" class="small-input" placeholder="mark 3" />
-            <input data-req7="3" class="small-input" placeholder="mark 4" />
+            <input data-req7="0" class="small-input" placeholder="الأسبوع الأوّل" />
+            <input data-req7="1" class="small-input" placeholder="الأسبوع الثّاني" />
+            <input data-req7="2" class="small-input" placeholder="الأسبوع الثّالث" />
+            <input data-req7="3" class="small-input" placeholder="الأسبوع الرّابع" />
           </div>
         </div>
       </div>
@@ -65,18 +65,18 @@
     <!-- Monthly calculation and results -->
     <section class="results">
       <div class="buttons-row">
-        <button id="calcAllWeeks">Calculate all weeks</button>
-        <button id="calcMonthly">Calculate Monthly Average</button>
+        <button id="calcAllWeeks">حساب معدّل كلّ اسبوع</button>
+        <button id="calcMonthly">حساب معدّل الشّهر</button>
       </div>
 
       <div class="output-row">
         <div class="result-box">
-          <label>Week Averages</label>
+          <label>معدّل الأسابيع</label>
           <div id="weekAveragesDisplay">-</div>
         </div>
 
         <div class="result-box">
-          <label>Monthly Average</label>
+          <label>معدّل الشّهر</label>
           <div id="monthlyAvgDisplay">-</div>
         </div>
       </div>
@@ -84,7 +84,7 @@
   </main>
 
   <footer class="footer-note">
-    Tip: fields autosave. Use "Save Student" to download a JSON you can later re-open with "Open a student ave".
+    
   </footer>
 
   <script src="script.js"></script>
