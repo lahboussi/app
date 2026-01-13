@@ -166,14 +166,85 @@ Main container
   text-align: left;
 }
 
+.week-navigation button {
+  background-color: rgb(212, 175, 55); /* gold */
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 8px 15px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
 
+.week-navigation button:hover {
+  background-color: rgb(249, 229, 184); /* light gold on hover */
+  color: rgb(58, 107, 53);             /* dark green text */
+}
+
+
+.tablefornav{
+
+  align-items: center ;
+}
 
 /* Weeks section: 2 columns layout */
 #weeks {
-  display: grid;
+   display: flex;
+   justify-content: center;
+  flex-direction: column;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+  align-items: center;
 }
+/* Week table card */
+.table-card {
+  width: 700px;               /* fixed width for nicer layout */
+  margin: 10px 0;   /* auto left/right margin centers it */
+  border: 2px solid rgb(212, 175, 55); /* golden border */
+  border-radius: 8px;
+  padding: 10px;
+  background-color: rgb(255, 250, 240); /* light cream background */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Table inside card */
+.table-card table {
+  width: 100%;                /* fill the card */
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+/* Table cells */
+.table-card th,
+.table-card td {
+  border: 1px solid rgb(212, 175, 55); /* golden borders */
+  padding: 6px;
+  text-align: center;
+}
+
+/* Input cells */
+.table-card input {
+  width: 60px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Black cell */
+.black-cell {
+  background-color: black;
+}
+
+/* Week average display */
+.week-average-display {
+  text-align: center;
+  font-size: 16px;
+  color: rgb(58, 107, 53); /* dark green */
+  margin-top: 10px;
+  font-weight: bold;
+}
+
 
 /* Table cards with Islamic rounded design */
 .table-card {
