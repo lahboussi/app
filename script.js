@@ -11,10 +11,10 @@
 
 /* ---------- Configuration ---------- */
 /* coefficients for Required1..Required5 */
-const COEFFICIENTS = [5,7,1,2,1]; // sum = 16
+const COEFFICIENTS = [5,7,1,2,5]; // sum = 16
 const DAYS = ['السّبت','الأحد','الإثنين','الثّلاثاء','الأربعاء','الخميس']; // rows 2..7
 const NUM_REQUIRED = 5;
-const requiredNames = ['الحفظ','المراجعة','حفظ المتن','مراجعة المتن','السّلوك'];
+const requiredNames = [' الحفظ و التّلخيص','المراجعة','حفظ المتن و الحديث','مراجعة المتن','السّلوك'];
 const r = 4;
 /* element refs */
 const weeksContainer = document.getElementById('weeks');
