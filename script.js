@@ -181,6 +181,38 @@ function buildWeekTable(weekIndex) {
   return card;
 }
 
+let currentWeek = 1;
+const totalWeeks = 4;
+
+// hide all weeks initially
+for (let w = 1; w <= totalWeeks; w++) {
+  const card = document.getElementById(`week-card-${w}`);
+  if (card) card.style.display = 'none';
+}
+// show current week
+document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
+document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+
+// navigation buttons
+document.getElementById('prevWeekBtn').addEventListener('click', () => {
+  if (currentWeek > 1) {
+    document.getElementById(`week-card-${currentWeek}`).style.display = 'none';
+    currentWeek--;
+    document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
+    document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+  }
+});
+
+document.getElementById('nextWeekBtn').addEventListener('click', () => {
+  if (currentWeek < totalWeeks) {
+    document.getElementById(`week-card-${currentWeek}`).style.display = 'none';
+    currentWeek++;
+    document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
+    document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+  }
+});
+
+
 /* ---------- Event handlers ---------- */
 function handleInputChange() {
   // autosave on any mark change

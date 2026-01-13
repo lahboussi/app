@@ -9,17 +9,14 @@
 <body>
   <header class="topbar">
     <div class="left">
-      <!-- Logo placeholder -->
       <div class="logo">LOGO</div>
     </div>
 
     <div class="title-area">
-      <!-- Big editable title; change text in HTML or later (keeps simple) -->
-      <h1 id="main-title" >تقويم طالب العلم</h1>
+      <h1 id="main-title">تقويم طالب العلم</h1>
     </div>
 
     <div class="right">
-      <!-- Three boxes: one, two, three -->
       <input id="studentName" class="top-input" placeholder="اسم و لقب الطالب" />
       <input id="monthName" class="top-input" placeholder="الشهر" />
       <input id="teacherName" class="top-input" placeholder="الشيخ" />
@@ -33,43 +30,44 @@
   </header>
 
   <main class="container">
+
+    <!-- Comments Table -->
     <div class="comments-wrapper">
- 
-    <!-- Comments Table (3 rows × 2 columns) -->
-<table id="commentsTable" class="comments-table">
-  <tr>
-   
-    <td><textarea id="comment1"></textarea></td> 
-    <th>مقرّر الحفظ</th>
-  </tr>
+      <table id="commentsTable" class="comments-table">
+        <tr>
+          <td><textarea id="comment1"></textarea></td> 
+          <th>مقرّر الحفظ</th>
+        </tr>
+        <tr>
+          <td><textarea id="comment2"></textarea></td>
+          <th>المراجعة</th>
+        </tr>
+        <tr>
+          <td><textarea id="comment3"></textarea></td>
+          <th>الأبيات</th>
+        </tr>
+      </table>
+    </div>
+<div class="tablefornav">
+    <!-- Week Navigation -->
+    <div class="week-navigation" style="text-align:center; margin:20px 0;">
+      <button id="prevWeekBtn">السّابقة</button>
+      <span id="currentWeekLabel" style="font-weight:bold; margin: 0 10px;">الأسبوع 1</span>
+      <button id="nextWeekBtn">التالية</button>
+    </div>
 
-  <tr>
-    
-    <td><textarea id="comment2"></textarea></td>
-    <th>المراجعة</th>
-  </tr>
-
-  <tr>
-    
-    <td><textarea id="comment3"></textarea></td>
-    <th>الأبيات</th>
-  </tr>
-
-  </table>
-</div>
-
-    
-    <!-- Area for four week tables -->
+    <!-- Area for week tables -->
     <section id="weeks">
-      <!-- JS will populate the 4 week tables -->
+      <!-- JS will populate 4 week tables here, but only one shown at a time -->
     </section>
+    </div>
 
     <!-- Extra tables: Required 6 and Required 7 -->
     <section class="extras">
       <div class="extra-card">
         <h3>السّرد</h3>
         <div class="req6">
-          <label>Required 6 label rls</label>
+          <label>Required 6 label</label>
           <input id="req6_mark" class="small-input" placeholder="النّقطة" />
         </div>
       </div>
