@@ -10,8 +10,9 @@
 /* ---------- Configuration ---------- */
 /* coefficients for Required1..Required5 */
 const COEFFICIENTS = [5,7,1,2,1]; // sum = 16
-const DAYS = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday']; // rows 2..7
+const DAYS = ['السّبت','الأحد','الإثنين','الثّلاثاء','الأربعاء','الخميس']; // rows 2..7
 const NUM_REQUIRED = 5;
+const requiredNames = ['الحفظ','المراجعة','حفظ المتن','مراجعة المتن','السّلوك'];
 
 /* element refs */
 const weeksContainer = document.getElementById('weeks');
@@ -44,7 +45,7 @@ function buildWeekTable(weekIndex) {
   card.id = `week-card-${weekIndex}`;
 
   const h = document.createElement('h3');
-  h.textContent = `Week ${weekIndex}`;
+  h.textContent = `الأسبوع ${weekIndex}`;
   card.appendChild(h);
 
   // build table
@@ -55,15 +56,21 @@ function buildWeekTable(weekIndex) {
   // first header cell: Days / Required
   const th1 = document.createElement('th');
   th1.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;">
-                     <div><strong>DAYS</strong></div>
-                     <div style="font-size:12px;color:rgba(0,0,0,0.6)">required</div>
+                     <div><strong>الأيام</strong></div>
+                     <div style="font-size:12px;color:rgba(0,0,0,0.6)">المطلوب</div>
                    </div>`;
   hrow.appendChild(th1);
 
   // required headers 1..5
-  for (let r = 1; r <= NUM_REQUIRED; r++) {
+  // for (let r = 1; r <= NUM_REQUIRED; r++) {
+  //   const th = document.createElement('th');
+  //   th.textContent = `Required ${r}`;
+  //   hrow.appendChild(th);
+  ////
+  // required headers 1..5 using custom names
+  for (let r = 0; r < requiredNames.length; r++) {
     const th = document.createElement('th');
-    th.textContent = `Required ${r}`;
+    th.textContent = requiredNames[r]; // use custom names
     hrow.appendChild(th);
   }
   thead.appendChild(hrow);
@@ -113,7 +120,7 @@ function buildWeekTable(weekIndex) {
   // Coefficients row: box(8,1) 'coefficients' label and box(8,2..6) coefficients
   const trCoef = document.createElement('tr');
   const tdCoefLabel = document.createElement('td');
-  tdCoefLabel.textContent = 'Coefficients';
+  tdCoefLabel.textContent = 'المعاملات';
   tdCoefLabel.className = 'coef-cell';
   trCoef.appendChild(tdCoefLabel);
 
@@ -129,7 +136,7 @@ function buildWeekTable(weekIndex) {
   // Averages row: box(9,1) 'Average' label and box(9,2..6) computed averages
   const trAvg = document.createElement('tr');
   const tdAvgLabel = document.createElement('td');
-  tdAvgLabel.textContent = 'Average';
+  tdAvgLabel.textContent = 'المجموع';
   tdAvgLabel.className = 'avg-cell';
   trAvg.appendChild(tdAvgLabel);
 
@@ -150,7 +157,7 @@ function buildWeekTable(weekIndex) {
 
   // Week buttons: calculate week average + display area
   const btn = document.createElement('button');
-  btn.textContent = `Calculate Week ${weekIndex} Average`;
+  btn.textContent = `حساب معدّل الأسبوع  ${weekIndex} `;
   btn.addEventListener('click', () => {
     const avg = calculateWeekAverage(weekIndex);
     // show week average near the table
@@ -468,4 +475,8 @@ window.addEventListener('DOMContentLoaded', () => {
   loadFromLocal();
   // update any displayed week averages (if present)
   updateWeekAveragesDisplay();
+});
+// Clear previous saved marks when the page loads
+window.addEventListener('load', () => {
+    localStorage.clear(); // this removes all saved marks
 });
