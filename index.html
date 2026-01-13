@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Student Monthly Average</title>
+  <title>تقويم الطّلاب الشّهري</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,7 +15,7 @@
 
     <div class="title-area">
       <!-- Big editable title; change text in HTML or later (keeps simple) -->
-      <h1 id="main-title" contenteditable="true" title="Click to edit title">تقويم طالب العلم</h1>
+      <h1 id="main-title" >تقويم طالب العلم</h1>
     </div>
 
     <div class="right">
@@ -33,6 +33,32 @@
   </header>
 
   <main class="container">
+    <div class="comments-wrapper">
+ 
+    <!-- Comments Table (3 rows × 2 columns) -->
+<table id="commentsTable" class="comments-table">
+  <tr>
+   
+    <td><textarea id="comment1"></textarea></td> 
+    <th>مقرّر الحفظ</th>
+  </tr>
+
+  <tr>
+    
+    <td><textarea id="comment2"></textarea></td>
+    <th>المراجعة</th>
+  </tr>
+
+  <tr>
+    
+    <td><textarea id="comment3"></textarea></td>
+    <th>الأبيات</th>
+  </tr>
+
+  </table>
+</div>
+
+    
     <!-- Area for four week tables -->
     <section id="weeks">
       <!-- JS will populate the 4 week tables -->

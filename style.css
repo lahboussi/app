@@ -20,8 +20,7 @@ Colors: Gold / Yellow / White / Dark / Green
 
 body {
   background: var(--muted);
-  background-color: #eeefdd;
-  color: var(--dark);
+  background-color:rgba(249, 229, 184, 0.5);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -45,14 +44,14 @@ Topbar with Islamic geometric feel
 
 .left .logo {
   width: 88px;
-  height: 48px;
+  height: 50px;
   background: var(--gold);
   color: var(--dark);
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 100px;
   font-family: 'Amiri', serif;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   /*background-image:url(Images/logo.png);*/
@@ -61,11 +60,14 @@ Topbar with Islamic geometric feel
 .title-area {
   flex: 1;
   text-align: center;
+  border: var(--dark) solid 4px ;
+  border-radius: 40px;
+  box-shadow: #0b0b0b;
 }
 
 #main-title {
   font-size: 24px;
-  color: var(--green);
+  color: wheat;
   font-weight: 700;
   text-shadow: 1px 1px var(--gold);
   user-select: text;
@@ -98,7 +100,8 @@ Top right inputs
 }
 
 button {
-  background: var(--green);
+   background-color: rgb(58, 107, 53); /* dark green button */
+  color: rgb(255, 255, 255);
   color: var(--white);
   border: none;
   padding: 8px 14px;
@@ -127,7 +130,40 @@ Main container
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  /*     make it in the right       */
 }
+.comments-table {
+  width: 60%;                 /* NOT full width */
+  margin: 30px auto;          /* center the table */
+  border-collapse: collapse;
+}
+
+/* table borders */
+.comments-table th,
+.comments-table td {
+  border: 1px solid rgb(212, 175, 55);
+  padding: 8px;
+}
+
+/* STYLE Comment 1 / Comment 2 titles (left column) */
+.comments-table td:first-child {
+  text-align: center;
+  font-weight: bold;
+  font-size: 15px;
+  color: rgb(58, 107, 53);              /* dark green */
+  background-color: rgb(249, 229, 184); /* light gold */
+  font-family: 'Georgia', serif;
+  letter-spacing: 1px;
+}
+
+/* textarea stays simple */
+.comments-table textarea {
+  width: 100%;
+  min-height: 40px;
+  resize: vertical;
+}
+
+
 
 /* Weeks section: 2 columns layout */
 #weeks {
@@ -140,6 +176,8 @@ Main container
 .table-card {
   background: var(--white);
   border-radius: 25px;
+    background-color: rgba(249, 229, 184, 0.8); /* light gold card */
+  border: 2px solid rgb(212, 175, 55); /* gold border */
   padding: 15px;
   box-shadow: var(--card-shadow);
   border: 3px solid var(--gold);

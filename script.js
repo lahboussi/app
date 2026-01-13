@@ -5,6 +5,8 @@
    - Monthly average calculation (using weeks + req6 + req7 as specified)
    - Autosave/load via localStorage
    - Save as JSON (download) and Open JSON (file upload)
+
+   just ver
 */
 
 /* ---------- Configuration ---------- */
@@ -13,7 +15,7 @@ const COEFFICIENTS = [5,7,1,2,1]; // sum = 16
 const DAYS = ['السّبت','الأحد','الإثنين','الثّلاثاء','الأربعاء','الخميس']; // rows 2..7
 const NUM_REQUIRED = 5;
 const requiredNames = ['الحفظ','المراجعة','حفظ المتن','مراجعة المتن','السّلوك'];
-
+const r = 4;
 /* element refs */
 const weeksContainer = document.getElementById('weeks');
 const req6Input = document.getElementById('req6_mark');
@@ -300,7 +302,9 @@ function buildDataObject() {
     weeks: {}, // week1..4: arrays of marks (6 days x 5 required), we'll store as rows of arrays where black cells are null
     req6: req6Input.value || '',
     req7: req7Inputs.map(i => i.value || ''),
+    
     weekAverages: []
+    
   };
 
   for (let w = 1; w <= 4; w++) {
@@ -334,6 +338,12 @@ function buildDataObject() {
 
   // monthly average displayed
   data.monthlyDisplay = monthlyAvgDisplay.textContent || '';
+    // --- save comments ---
+  data.comments = {
+      comment1: document.getElementById('comment1').value || '',
+      comment2: document.getElementById('comment2').value || '',
+      comment3: document.getElementById('comment3').value || ''
+  };
 
   return data;
 }
@@ -402,6 +412,15 @@ function populateFromData(data) {
   }
 
   if (data.monthlyDisplay) monthlyAvgDisplay.textContent = data.monthlyDisplay;
+
+    // --- restore comments ---
+  if (data.comments) {
+      document.getElementById('comment1').value = data.comments.comment1 || '';
+      document.getElementById('comment2').value = data.comments.comment2 || '';
+      document.getElementById('comment3').value = data.comments.comment3 || '';
+  }
+
+
 }
 
 /* Download JSON file for saving student */
@@ -469,6 +488,12 @@ calcMonthlyBtn.addEventListener('click', () => {
 /* Save req6/req7 changes */
 req6Input.addEventListener('input', autosaveToLocal);
 req7Inputs.forEach(i => i.addEventListener('input', autosaveToLocal));
+// LOAD COMMENTS
+if (data.comments) {
+    document.getElementById('comment1').value = data.comments.comment1 || '';
+    document.getElementById('comment2').value = data.comments.comment2 || '';
+}
+
 
 /* ---------- On load: populate from localStorage if present ---------- */
 window.addEventListener('DOMContentLoaded', () => {
