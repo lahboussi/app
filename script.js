@@ -1,21 +1,18 @@
 /* script.js
-   Handles:
-   - Building the 4 week tables
-   - Calculations for per-required averages and week average per your formulas
-   - Monthly average calculation (using weeks + req6 + req7 as specified)
-   - Autosave/load via localStorage
-   - Save as JSON (download) and Open JSON (file upload)
-
-   just ver
+   Updated to:
+   1) Evaluate req7 inputs (جيد / سيء) and set varGood / varBad
+   2) New monthly average formula and adjustment by varGood/varBad
+   3) Preserve save/load/autosave behaviour
 */
 
 /* ---------- Configuration ---------- */
 /* coefficients for Required1..Required5 */
-const COEFFICIENTS = [5,7,1,2,5]; // sum = 16
-const DAYS = ['السّبت','الأحد','الإثنين','الثّلاثاء','الأربعاء','الخميس']; // rows 2..7
+const COEFFICIENTS = [5,7,1,2,5]; // sum used where needed
+const DAYS = ['السّبت','الأحد','الإثنين','الثّلاثاء','الأربعاء','الخميس'];
 const NUM_REQUIRED = 5;
 const requiredNames = [' الحفظ و التّلخيص','المراجعة','حفظ المتن و الحديث','مراجعة المتن','السّلوك'];
-const r = 4;
+
+
 /* element refs */
 const weeksContainer = document.getElementById('weeks');
 const req6Input = document.getElementById('req6_mark');
@@ -31,17 +28,18 @@ const monthlyAvgDisplay = document.getElementById('monthlyAvgDisplay');
 const calcAllWeeksBtn = document.getElementById('calcAllWeeks');
 const calcMonthlyBtn = document.getElementById('calcMonthly');
 
-/* localStorage key */
 const STORAGE_KEY = 'student_ave_current_v1';
 
+/* ---------- State for req7 evaluation ---------- */
+let varGood = false; // true if all req7 are "جيد"
+let varBad = false;  // true if any req7 contains "سيء"
+
 /* ---------- Build 4 week tables ---------- */
-/* We'll generate 4 similar tables (week1..week4) with inputs carrying data-week, data-row, data-col attributes */
 for (let w = 1; w <= 4; w++) {
   weeksContainer.appendChild(buildWeekTable(w));
 }
 
 function buildWeekTable(weekIndex) {
-  // card wrapper
   const card = document.createElement('div');
   card.className = 'table-card';
   card.id = `week-card-${weekIndex}`;
@@ -50,12 +48,10 @@ function buildWeekTable(weekIndex) {
   h.textContent = `الأسبوع ${weekIndex}`;
   card.appendChild(h);
 
-  // build table
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const hrow = document.createElement('tr');
 
-  // first header cell: Days / Required
   const th1 = document.createElement('th');
   th1.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;">
                      <div><strong>الأيام</strong></div>
@@ -63,54 +59,38 @@ function buildWeekTable(weekIndex) {
                    </div>`;
   hrow.appendChild(th1);
 
-  // required headers 1..5
-  // for (let r = 1; r <= NUM_REQUIRED; r++) {
-  //   const th = document.createElement('th');
-  //   th.textContent = `Required ${r}`;
-  //   hrow.appendChild(th);
-  ////
-  // required headers 1..5 using custom names
   for (let r = 0; r < requiredNames.length; r++) {
     const th = document.createElement('th');
-    th.textContent = requiredNames[r]; // use custom names
+    th.textContent = requiredNames[r];
     hrow.appendChild(th);
   }
   thead.appendChild(hrow);
   table.appendChild(thead);
 
-  // body rows: rows 1..9 (but we create exactly the rows requested)
   const tbody = document.createElement('tbody');
 
-  // rows for days: row indices 2..7 in your spec are actual data rows (6 rows)
   for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
     const tr = document.createElement('tr');
-    // col 1: day name
     const tdDay = document.createElement('td');
     tdDay.textContent = DAYS[dayIndex];
     tr.appendChild(tdDay);
 
-    // columns 2..6 required inputs
     for (let col = 1; col <= NUM_REQUIRED; col++) {
       const td = document.createElement('td');
 
-      // special black cell: box(7,4) -> dayIndex 5 (Thursday) and col=3? careful:
-      // dayIndex 5 corresponds to Thursday; column number 4 (per user) => required3 is column index 3 (since col starts 1)
-      // user referred to box(7,4) meaning row 7 (Thursday) and column 4 (which is Required3).
-      // So if dayIndex = 5 (Thursday) and col === 3 then mark black.
+      // black cell: Thursday & required3
       if (dayIndex === 5 && col === 3) {
         td.className = 'black-cell';
-        td.innerHTML = ''; // empty black cell
+        td.innerHTML = '';
       } else {
         const input = document.createElement('input');
         input.type = 'number';
         input.step = 'any';
         input.min = 0;
         input.className = 'input-cell';
-        // data attributes to locate later
         input.dataset.week = weekIndex;
-        input.dataset.day = dayIndex; // 0..5
-        input.dataset.req = col; // 1..5
-        // listen for changes to autosave
+        input.dataset.day = dayIndex;
+        input.dataset.req = col;
         input.addEventListener('input', handleInputChange);
         td.appendChild(input);
       }
@@ -119,7 +99,7 @@ function buildWeekTable(weekIndex) {
     tbody.appendChild(tr);
   }
 
-  // Coefficients row: box(8,1) 'coefficients' label and box(8,2..6) coefficients
+  // coefficients row
   const trCoef = document.createElement('tr');
   const tdCoefLabel = document.createElement('td');
   tdCoefLabel.textContent = 'المعاملات';
@@ -135,7 +115,7 @@ function buildWeekTable(weekIndex) {
   }
   tbody.appendChild(trCoef);
 
-  // Averages row: box(9,1) 'Average' label and box(9,2..6) computed averages
+  // averages row
   const trAvg = document.createElement('tr');
   const tdAvgLabel = document.createElement('td');
   tdAvgLabel.textContent = 'المجموع';
@@ -145,7 +125,6 @@ function buildWeekTable(weekIndex) {
   for (let req = 1; req <= NUM_REQUIRED; req++) {
     const td = document.createElement('td');
     td.className = 'avg-cell';
-    // show computed average here
     const span = document.createElement('span');
     span.id = `week${weekIndex}-avg-req${req}`;
     span.textContent = '-';
@@ -157,12 +136,10 @@ function buildWeekTable(weekIndex) {
   table.appendChild(tbody);
   card.appendChild(table);
 
-  // Week buttons: calculate week average + display area
   const btn = document.createElement('button');
   btn.textContent = `حساب معدّل الأسبوع  ${weekIndex} `;
   btn.addEventListener('click', () => {
     const avg = calculateWeekAverage(weekIndex);
-    // show week average near the table
     let display = card.querySelector('.week-average-display');
     if (!display) {
       display = document.createElement('div');
@@ -172,7 +149,6 @@ function buildWeekTable(weekIndex) {
       card.appendChild(display);
     }
     display.textContent = `Week ${weekIndex} average: ${isNaN(avg) ? '-' : avg.toFixed(2)}`;
-    // update global week averages display
     updateWeekAveragesDisplay();
     autosaveToLocal();
   });
@@ -181,95 +157,79 @@ function buildWeekTable(weekIndex) {
   return card;
 }
 
+/* ---------- Week navigation (show one week at a time) ---------- */
 let currentWeek = 1;
 const totalWeeks = 4;
 
-// hide all weeks initially
+// hide all weeks and show current
 for (let w = 1; w <= totalWeeks; w++) {
   const card = document.getElementById(`week-card-${w}`);
   if (card) card.style.display = 'none';
 }
-// show current week
-document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
-document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+const firstCard = document.getElementById(`week-card-${currentWeek}`);
+if (firstCard) firstCard.style.display = 'block';
+const currentWeekLabelEl = document.getElementById('currentWeekLabel');
+if (currentWeekLabelEl) currentWeekLabelEl.textContent = `الأسبوع ${currentWeek}`;
 
-// navigation buttons
-document.getElementById('prevWeekBtn').addEventListener('click', () => {
+const prevBtn = document.getElementById('prevWeekBtn');
+const nextBtn = document.getElementById('nextWeekBtn');
+if (prevBtn) prevBtn.addEventListener('click', () => {
   if (currentWeek > 1) {
-    document.getElementById(`week-card-${currentWeek}`).style.display = 'none';
+    const prevCard = document.getElementById(`week-card-${currentWeek}`);
+    if (prevCard) prevCard.style.display = 'none';
     currentWeek--;
-    document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
-    document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+    const newCard = document.getElementById(`week-card-${currentWeek}`);
+    if (newCard) newCard.style.display = 'block';
+    if (currentWeekLabelEl) currentWeekLabelEl.textContent = `الأسبوع ${currentWeek}`;
   }
 });
-
-document.getElementById('nextWeekBtn').addEventListener('click', () => {
+if (nextBtn) nextBtn.addEventListener('click', () => {
   if (currentWeek < totalWeeks) {
-    document.getElementById(`week-card-${currentWeek}`).style.display = 'none';
+    const prevCard = document.getElementById(`week-card-${currentWeek}`);
+    if (prevCard) prevCard.style.display = 'none';
     currentWeek++;
-    document.getElementById(`week-card-${currentWeek}`).style.display = 'block';
-    document.getElementById('currentWeekLabel').textContent = `الأسبوع ${currentWeek}`;
+    const newCard = document.getElementById(`week-card-${currentWeek}`);
+    if (newCard) newCard.style.display = 'block';
+    if (currentWeekLabelEl) currentWeekLabelEl.textContent = `الأسبوع ${currentWeek}`;
   }
 });
-
 
 /* ---------- Event handlers ---------- */
 function handleInputChange() {
-  // autosave on any mark change
   autosaveToLocal();
 }
 
 /* ---------- Calculation functions ---------- */
 
-/**
- * calculate per-required averages for a week and then compute the week average per your rules.
- * Also updates the average cells in the DOM.
- * Returns the computed week average number.
- */
 function calculateWeekAverage(weekIndex) {
-  // for each required (1..5) compute:
-  // reqAvg = (sum of marks for that required in allowed days * coefficient) / denom
-  // where denom is 6 for requireds 1,2,4,5 and 5 for required3 (since required3 excludes Thursday)
   const perReqAverages = [];
   for (let req = 1; req <= NUM_REQUIRED; req++) {
     let sumMarks = 0;
-    let daysCount = 0;
     for (let day = 0; day < DAYS.length; day++) {
-      // skip black cell: Thursday (day=5) for required3 (req===3)
       if (day === 5 && req === 3) continue;
       const input = document.querySelector(`input[data-week="${weekIndex}"][data-day="${day}"][data-req="${req}"]`);
       const val = input && input.value !== '' ? parseFloat(input.value) : 0;
       sumMarks += isNaN(val) ? 0 : val;
-      daysCount++;
     }
     const coef = COEFFICIENTS[req-1];
-    // denominator per your spec:
-    let denom;
-    if (req === 3) denom = 5; // required3: sum from saturday to wednesday then mult by coef and divide by 5
-    else denom = 6;
-    // compute average value as the user defined (sum * coef / denom)
+    const denom = (req === 3) ? 5 : 6;
     const avgVal = (sumMarks * coef) / denom;
     perReqAverages.push(avgVal);
-
-    // update display cell
     const span = document.getElementById(`week${weekIndex}-avg-req${req}`);
     if (span) span.textContent = isNaN(avgVal) ? '-' : avgVal.toFixed(2);
   }
 
-  // week average = (sum of perReqAverages) / sum of coefficients (which is 16)
   const numerator = perReqAverages.reduce((a,b) => a+b, 0);
-  const denomTotal = COEFFICIENTS.reduce((a,b) => a+b, 0); // should be 16
+  const denomTotal = COEFFICIENTS.reduce((a,b) => a+b, 0);
   const weekAvg = denomTotal === 0 ? 0 : numerator / denomTotal;
 
-  // store the week average text inside the card display (if present)
   const card = document.getElementById(`week-card-${weekIndex}`);
-  const display = card.querySelector('.week-average-display');
+  const display = card ? card.querySelector('.week-average-display') : null;
   if (display) display.textContent = `Week ${weekIndex} average: ${isNaN(weekAvg) ? '-' : weekAvg.toFixed(2)}`;
 
   return weekAvg;
 }
 
-/* Calculate all four weeks and update displays */
 function calculateAllWeeks() {
   const weeks = [];
   for (let w = 1; w <= 4; w++) {
@@ -285,7 +245,7 @@ function updateWeekAveragesDisplay() {
   const weekAvgs = [];
   for (let w = 1; w <= 4; w++) {
     const card = document.getElementById(`week-card-${w}`);
-    const display = card.querySelector('.week-average-display');
+    const display = card ? card.querySelector('.week-average-display') : null;
     if (display) {
       const text = display.textContent || '';
       const match = text.match(/average:\s*([0-9.\-]+)/i);
@@ -298,31 +258,77 @@ function updateWeekAveragesDisplay() {
   weekAveragesDisplay.textContent = weekAvgs.join(' | ');
 }
 
-/* Monthly average per user formula:
-   monthlyAvg = (sum of the 4 week averages) + (req6_mark * 5) + (sum(req7_marks) * 2)  all divided by 17
+/* ---------- req7 evaluation ---------- */
+/* Evaluate req7 inputs:
+   - if all are "جيد" -> varGood = true
+   - if any contains "سيء" -> varBad = true
+   stores a status string for saving ("good"/"bad"/"")
+*/
+function normalizeArabic(s) {
+  if (!s && s !== 0) return '';
+  return String(s).trim();
+}
+
+function evaluateReq7() {
+  // read values
+  const vals = req7Inputs.map(i => normalizeArabic(i.value));
+  // default
+  varGood = false;
+  varBad = false;
+
+  // if any contains "سيء" (exact substring) -> varBad
+  for (const v of vals) {
+    if (!v) continue;
+    if (v.indexOf('سيء') !== -1) {
+      varBad = true;
+      break;
+    }
+  }
+
+  // varGood only if none empty and all equal "جيد" (exact)
+  if (!varBad) {
+    const allGood = vals.length > 0 && vals.every(v => v === 'جيد');
+    if (allGood) varGood = true;
+  }
+
+  // return status for informational use
+  if (varBad) return 'bad';
+  if (varGood) return 'good';
+  return '';
+}
+
+/* ---------- Monthly average (new formula) ----------
+   new: ((sum of 4 week averages * 8) + (req6 * 10)) / 44.23
+   then +1 if varGood, -1 if varBad
 */
 function calculateMonthlyAverage() {
   // ensure week averages are up-to-date
-  const weeks = calculateAllWeeks(); // returns numeric values
+  const weeks = calculateAllWeeks(); // numeric values
   const sumWeeks = weeks.reduce((a,b) => a + (isNaN(b) ? 0 : b), 0);
 
+  // parse req6 as number
   const req6 = req6Input.value !== '' ? parseFloat(req6Input.value) : 0;
-  const req7Sum = req7Inputs.reduce((acc, el) => {
-    const v = el.value !== '' ? parseFloat(el.value) : 0;
-    return acc + (isNaN(v) ? 0 : v);
-  }, 0);
 
-  const numerator = sumWeeks + (req6 * 5) + (req7Sum * 2);
-  const monthlyAvg = 17 === 0 ? 0 : numerator / 17;
+  // compute
+  const numerator = (sumWeeks * 8) + (req6 * 10);
+  let monthly = 44.23 === 0 ? 0 : numerator / 44.23;
 
-  monthlyAvgDisplay.textContent = isNaN(monthlyAvg) ? '-' : monthlyAvg.toFixed(2);
+  // evaluate req7 status
+  const status = evaluateReq7();
+  if (status === 'good') monthly += 1;
+  else if (status === 'bad') monthly -= 1;
+
+  // round to 2 decimals
+  const final = isNaN(monthly) ? '-' : Number(monthly.toFixed(2));
+  monthlyAvgDisplay.textContent = (final === '-') ? '-' : final.toFixed(2);
+
+  // store req7Status if needed in autosave
   autosaveToLocal();
-  return monthlyAvg;
+  return final;
 }
 
 /* ---------- Save / Load (localStorage & file) ---------- */
 
-/* Build data object representing current page state */
 function buildDataObject() {
   const data = {
     meta: {
@@ -331,12 +337,10 @@ function buildDataObject() {
       teacher: teacherNameInput.value || '',
       title: document.getElementById('main-title').textContent || ''
     },
-    weeks: {}, // week1..4: arrays of marks (6 days x 5 required), we'll store as rows of arrays where black cells are null
+    weeks: {},
     req6: req6Input.value || '',
     req7: req7Inputs.map(i => i.value || ''),
-    
     weekAverages: []
-    
   };
 
   for (let w = 1; w <= 4; w++) {
@@ -345,7 +349,7 @@ function buildDataObject() {
       const row = [];
       for (let req = 1; req <= NUM_REQUIRED; req++) {
         if (day === 5 && req === 3) {
-          row.push(null); // black cell
+          row.push(null);
         } else {
           const input = document.querySelector(`input[data-week="${w}"][data-day="${day}"][data-req="${req}"]`);
           row.push(input && input.value !== '' ? input.value : '');
@@ -356,10 +360,9 @@ function buildDataObject() {
     data.weeks[`week${w}`] = weekArray;
   }
 
-  // store displayed week averages too (if present)
   for (let w = 1; w <= 4; w++) {
     const card = document.getElementById(`week-card-${w}`);
-    const display = card.querySelector('.week-average-display');
+    const display = card ? card.querySelector('.week-average-display') : null;
     if (display) {
       const match = display.textContent.match(/average:\s*([0-9.\-]+)/i);
       data.weekAverages.push(match ? match[1] : '');
@@ -368,19 +371,21 @@ function buildDataObject() {
     }
   }
 
-  // monthly average displayed
   data.monthlyDisplay = monthlyAvgDisplay.textContent || '';
-    // --- save comments ---
+
+  // save comments
   data.comments = {
-      comment1: document.getElementById('comment1').value || '',
-      comment2: document.getElementById('comment2').value || '',
-      comment3: document.getElementById('comment3').value || ''
+    comment1: document.getElementById('comment1').value || '',
+    comment2: document.getElementById('comment2').value || '',
+    comment3: document.getElementById('comment3').value || ''
   };
+
+  // save req7 status (derived)
+  data.req7Status = evaluateReq7(); // "good" | "bad" | ""
 
   return data;
 }
 
-/* Autosave to localStorage */
 function autosaveToLocal() {
   try {
     const data = buildDataObject();
@@ -390,7 +395,6 @@ function autosaveToLocal() {
   }
 }
 
-/* Load from localStorage (if any) */
 function loadFromLocal() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -402,7 +406,6 @@ function loadFromLocal() {
   }
 }
 
-/* Populate page fields from a loaded data object */
 function populateFromData(data) {
   if (!data) return;
   studentNameInput.value = data.meta?.student || '';
@@ -415,7 +418,7 @@ function populateFromData(data) {
     for (let day = 0; day < DAYS.length; day++) {
       const row = weekArray[day] || [];
       for (let req = 1; req <= NUM_REQUIRED; req++) {
-        if (day === 5 && req === 3) continue; // black cell
+        if (day === 5 && req === 3) continue;
         const val = row[req-1] !== undefined ? row[req-1] : '';
         const input = document.querySelector(`input[data-week="${w}"][data-day="${day}"][data-req="${req}"]`);
         if (input) input.value = val;
@@ -426,37 +429,40 @@ function populateFromData(data) {
   req6Input.value = data.req6 || '';
   req7Inputs.forEach((el, idx) => el.value = (data.req7 && data.req7[idx]) ? data.req7[idx] : '');
 
-  // restore displayed weekly averages and monthly if present
   if (Array.isArray(data.weekAverages)) {
     for (let w = 1; w <= 4; w++) {
       const card = document.getElementById(`week-card-${w}`);
-      let display = card.querySelector('.week-average-display');
-      if (!display) {
+      let display = card ? card.querySelector('.week-average-display') : null;
+      if (!display && card) {
         display = document.createElement('div');
         display.className = 'week-average-display';
         display.style.marginTop = '8px';
         display.style.fontWeight = '700';
         card.appendChild(display);
       }
-      display.textContent = data.weekAverages[w-1] ? `Week ${w} average: ${data.weekAverages[w-1]}` : '';
+      if (display) display.textContent = data.weekAverages[w-1] ? `Week ${w} average: ${data.weekAverages[w-1]}` : '';
     }
     updateWeekAveragesDisplay();
   }
 
   if (data.monthlyDisplay) monthlyAvgDisplay.textContent = data.monthlyDisplay;
 
-    // --- restore comments ---
+  // restore comments
   if (data.comments) {
-      document.getElementById('comment1').value = data.comments.comment1 || '';
-      document.getElementById('comment2').value = data.comments.comment2 || '';
-      document.getElementById('comment3').value = data.comments.comment3 || '';
+    document.getElementById('comment1').value = data.comments.comment1 || '';
+    document.getElementById('comment2').value = data.comments.comment2 || '';
+    document.getElementById('comment3').value = data.comments.comment3 || '';
   }
 
-
+  // restore req7 status (derived) - update varGood/varBad
+  evaluateReq7();
 }
 
 /* Download JSON file for saving student */
 function downloadDataAsFile() {
+  // ensure latest req7 evaluation saved
+  evaluateReq7();
+
   const data = buildDataObject();
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], {type: 'application/json'});
@@ -488,7 +494,7 @@ function handleFileOpen(file) {
   reader.readAsText(file);
 }
 
-/* ---------- Wire up buttons ---------- */
+/* ---------- Wire up buttons & events ---------- */
 saveBtn.addEventListener('click', () => {
   downloadDataAsFile();
 });
@@ -500,7 +506,6 @@ openBtn.addEventListener('click', () => {
 fileInput.addEventListener('change', (ev) => {
   const f = ev.target.files[0];
   if (f) handleFileOpen(f);
-  // clear file input so same file can be re-loaded later if needed
   fileInput.value = '';
 });
 
@@ -514,26 +519,24 @@ calcMonthlyBtn.addEventListener('click', () => {
   alert(`Monthly average: ${isNaN(val) ? '-' : val.toFixed(2)}`);
 });
 
-/* Save on metadata changes */
 [studentNameInput, monthNameInput, teacherNameInput].forEach(el => el.addEventListener('input', autosaveToLocal));
-
-/* Save req6/req7 changes */
 req6Input.addEventListener('input', autosaveToLocal);
-req7Inputs.forEach(i => i.addEventListener('input', autosaveToLocal));
-// LOAD COMMENTS
-if (data.comments) {
-    document.getElementById('comment1').value = data.comments.comment1 || '';
-    document.getElementById('comment2').value = data.comments.comment2 || '';
-}
 
+// call evaluateReq7 when any req7 input changes
+req7Inputs.forEach(i => {
+  i.addEventListener('input', () => {
+    evaluateReq7();
+    autosaveToLocal();
+  });
+});
 
-/* ---------- On load: populate from localStorage if present ---------- */
+/* ---------- On load ---------- */
 window.addEventListener('DOMContentLoaded', () => {
   loadFromLocal();
-  // update any displayed week averages (if present)
   updateWeekAveragesDisplay();
 });
-// Clear previous saved marks when the page loads
+
+
 window.addEventListener('load', () => {
     localStorage.clear(); // this removes all saved marks
 });
