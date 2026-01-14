@@ -1,10 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>تقويم الطّلاب الشّهري</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* small inline helper styles for req7 controls (you can move to style.css) */
+    .req7-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    .req7-input { width:120px; padding:6px; border-radius:6px; border:1px solid #ccc; text-align:center; }
+    .req7-btn { padding:6px 8px; border-radius:6px; border:none; cursor:pointer; font-weight:700; }
+    .req7-btn.good { background:#3a6b35; color:white; }
+    .req7-btn.bad  { background:#c0392b; color:white; }
+    .req7-label { min-width:140px; text-align:right; font-weight:700; color:#3a6b35; }
+    /* ensure page direction RTL */
+    body { direction: rtl; }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -35,7 +46,7 @@
     <div class="comments-wrapper">
       <table id="commentsTable" class="comments-table">
         <tr>
-          <td><textarea id="comment1"></textarea></td> 
+          <td><textarea id="comment1"></textarea></td>
           <th>مقرّر الحفظ</th>
         </tr>
         <tr>
@@ -48,40 +59,68 @@
         </tr>
       </table>
     </div>
-<div class="tablefornav">
-    <!-- Week Navigation -->
-    <div class="week-navigation" style="text-align:center; margin:20px 0;">
-      <button id="prevWeekBtn">السّابقة</button>
-      <span id="currentWeekLabel" style="font-weight:bold; margin: 0 10px;">الأسبوع 1</span>
-      <button id="nextWeekBtn">التالية</button>
-    </div>
 
-    <!-- Area for week tables -->
-    <section id="weeks">
-      <!-- JS will populate 4 week tables here, but only one shown at a time -->
-    </section>
+    <!-- Week Navigation -->
+    <div class="tablefornav">
+      <div class="week-navigation" style="text-align:center; margin:20px 0;">
+        <button id="prevWeekBtn">السّابقة</button>
+        <span id="currentWeekLabel" style="font-weight:bold; margin: 0 10px;">الأسبوع 1</span>
+        <button id="nextWeekBtn">التالية</button>
+      </div>
+
+      <!-- Area for week tables -->
+      <section id="weeks">
+        <!-- JS will populate 4 week tables here, but only one shown at a time -->
+      </section>
     </div>
 
     <!-- Extra tables: Required 6 and Required 7 -->
     <section class="extras">
       <div class="extra-card">
-        <h3>السّرد</h3>
+        <h3>السّرد (Required 6)</h3>
         <div class="req6">
-          <label>Required 6 label</label>
+          <label>نقطة السّرد</label>
           <input id="req6_mark" class="small-input" placeholder="النّقطة" />
         </div>
       </div>
 
       <div class="extra-card">
-        <h3>الخدمة (يوم في الاسبوع)</h3>
+        <h3>الخدمة الأسبوعية (Required 7)</h3>
         <div class="req7">
-          <label>Required 7 label</label>
-          <div class="req7-marks">
-            <input data-req7="0" class="small-input" placeholder="الأسبوع الأوّل" />
-            <input data-req7="1" class="small-input" placeholder="الأسبوع الثّاني" />
-            <input data-req7="2" class="small-input" placeholder="الأسبوع الثّالث" />
-            <input data-req7="3" class="small-input" placeholder="الأسبوع الرّابع" />
+          <label>اختر حالة الخدمة لكل أسبوع (جيد / سيء)</label>
+
+          <!-- For each of the 4 weeks: input + two quick-set buttons -->
+          <div class="req7-row">
+            <div class="req7-label">الأسبوع الأوّل</div>
+            <input data-req7="0" class="req7-input" id="req7_1" placeholder="جيد أو سيء" />
+            <button type="button" class="req7-btn good" data-set="جيد" data-for="req7_1">جيد</button>
+            <button type="button" class="req7-btn bad"  data-set="سيء" data-for="req7_1">سيء</button>
           </div>
+
+          <div class="req7-row">
+            <div class="req7-label">الأسبوع الثّاني</div>
+            <input data-req7="1" class="req7-input" id="req7_2" placeholder="جيد أو سيء" />
+            <button type="button" class="req7-btn good" data-set="جيد" data-for="req7_2">جيد</button>
+            <button type="button" class="req7-btn bad"  data-set="سيء" data-for="req7_2">سيء</button>
+          </div>
+
+          <div class="req7-row">
+            <div class="req7-label">الأسبوع الثّالث</div>
+            <input data-req7="2" class="req7-input" id="req7_3" placeholder="جيد أو سيء" />
+            <button type="button" class="req7-btn good" data-set="جيد" data-for="req7_3">جيد</button>
+            <button type="button" class="req7-btn bad"  data-set="سيء" data-for="req7_3">سيء</button>
+          </div>
+
+          <div class="req7-row">
+            <div class="req7-label">الأسبوع الرّابع</div>
+            <input data-req7="3" class="req7-input" id="req7_4" placeholder="جيد أو سيء" />
+            <button type="button" class="req7-btn good" data-set="جيد" data-for="req7_4">جيد</button>
+            <button type="button" class="req7-btn bad"  data-set="سيء" data-for="req7_4">سيء</button>
+          </div>
+
+          <!-- <div style="font-size:13px;color:#666;margin-top:6px;">
+            نصيحة: استخدم أزرار <strong>جيد</strong> أو <strong>سيء</strong> لتجنب الأخطاء الإملائية.
+          </div> -->
         </div>
       </div>
     </section>
@@ -107,10 +146,35 @@
     </section>
   </main>
 
-  <footer class="footer-note">
-    
-  </footer>
+  <footer class="footer-note"></footer>
 
   <script src="script.js"></script>
+
+  <script>
+    // Small helper to wire the quick-set buttons so they set inputs and trigger input events
+    document.addEventListener('DOMContentLoaded', () => {
+      // button click -> set corresponding input value, dispatch input event
+      document.querySelectorAll('.req7-btn').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          const val = btn.dataset.set;
+          const forId = btn.dataset.for;
+          const input = document.getElementById(forId);
+          if (!input) return;
+          input.value = val;
+          // dispatch input event so your script picks it up (autosave/evaluate)
+          const event = new Event('input', { bubbles: true });
+          input.dispatchEvent(event);
+        });
+      });
+
+      // also make sure manual typing triggers input events (already happens) and trimming
+      document.querySelectorAll('input[data-req7]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          // normalize full-width spaces etc if you like; keep simple here
+          inp.value = inp.value.trim();
+        });
+      });
+    });
+  </script>
 </body>
 </html>
