@@ -71,9 +71,52 @@ function buildWeekTable(weekIndex) {
 
   for (let dayIndex = 0; dayIndex < DAYS.length; dayIndex++) {
     const tr = document.createElement('tr');
+    // const tdDay = document.createElement('td');
+    // tdDay.textContent = DAYS[dayIndex];
+    // tr.appendChild(tdDay);
+
     const tdDay = document.createElement('td');
-    tdDay.textContent = DAYS[dayIndex];
-    tr.appendChild(tdDay);
+tdDay.style.position = 'relative';
+
+/* Day text */
+const dayLabel = document.createElement('span');
+dayLabel.textContent = DAYS[dayIndex];
+
+/* Comment icon */
+const icon = document.createElement('span');
+icon.textContent = '🗨️';
+icon.className = 'day-comment-icon';
+
+/* Bubble */
+const bubble = document.createElement('div');
+bubble.className = 'comment-bubble';
+
+const textarea = document.createElement('textarea');
+textarea.placeholder = 'اكتب ملاحظة اليوم...';
+textarea.dataset.week = weekIndex;
+textarea.dataset.day = dayIndex;
+
+/* Save on input */
+textarea.addEventListener('input', autosaveToLocal);
+
+bubble.appendChild(textarea);
+
+/* Toggle bubble */
+icon.addEventListener('click', (e) => {
+  e.stopPropagation();
+  bubble.style.display = bubble.style.display === 'block' ? 'none' : 'block';
+});
+
+/* Close when clicking outside */
+document.addEventListener('click', () => {
+  bubble.style.display = 'none';
+});
+
+tdDay.appendChild(icon);
+tdDay.appendChild(dayLabel);
+tdDay.appendChild(bubble);
+tr.appendChild(tdDay);
+
 
     for (let col = 1; col <= NUM_REQUIRED; col++) {
       const td = document.createElement('td');
@@ -380,6 +423,21 @@ function buildDataObject() {
     comment3: document.getElementById('comment3').value || ''
   };
 
+
+  data.dayComments = {};
+
+for (let w = 1; w <= 4; w++) {
+  data.dayComments[`week${w}`] = {};
+  for (let d = 0; d < DAYS.length; d++) {
+    const ta = document.querySelector(
+      `textarea[data-week="${w}"][data-day="${d}"]`
+    );
+    if (ta && ta.value.trim() !== '') {
+      data.dayComments[`week${w}`][`day${d}`] = ta.value;
+    }
+  }
+}
+
   // save req7 status (derived)
   data.req7Status = evaluateReq7(); // "good" | "bad" | ""
 
@@ -456,6 +514,21 @@ function populateFromData(data) {
 
   // restore req7 status (derived) - update varGood/varBad
   evaluateReq7();
+
+  if (data.dayComments) {
+  for (const weekKey in data.dayComments) {
+    for (const dayKey in data.dayComments[weekKey]) {
+      const w = weekKey.replace('week','');
+      const d = dayKey.replace('day','');
+      const ta = document.querySelector(
+        `textarea[data-week="${w}"][data-day="${d}"]`
+      );
+      if (ta) ta.value = data.dayComments[weekKey][dayKey];
+    }
+  }
+}
+
+
 }
 
 /* Download JSON file for saving student */
