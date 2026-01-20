@@ -13,6 +13,16 @@ const NUM_REQUIRED = 5;
 const requiredNames = [' الحفظ و التّلخيص','المراجعة','حفظ المتن و الحديث','مراجعة المتن','السّلوك'];
 
 
+const monthlyCommentBtn = document.getElementById('monthlyCommentBtn');
+const monthlyCommentBubble = document.getElementById('monthlyCommentBubble');
+const monthlyCommentText = document.getElementById('monthlyCommentText');
+
+monthlyCommentBtn.addEventListener('click', () => {
+  monthlyCommentBubble.classList.toggle('hidden');
+  monthlyCommentText.focus();
+});
+
+
 /* element refs */
 const weeksContainer = document.getElementById('weeks');
 const req6Input = document.getElementById('req6_mark');
@@ -438,6 +448,9 @@ for (let w = 1; w <= 4; w++) {
   }
 }
 
+data.monthlyComment = monthlyCommentText.value || '';
+
+
   // save req7 status (derived)
   data.req7Status = evaluateReq7(); // "good" | "bad" | ""
 
@@ -464,12 +477,43 @@ function loadFromLocal() {
   }
 }
 
+function collectAllDailyComments(data) {
+  if (!data.dailyComments) return '';
+
+  let result = '';
+
+  Object.keys(data.dailyComments).forEach(key => {
+    const text = data.dailyComments[key];
+    if (text && text.trim() !== '') {
+      result += '• ' + text.trim() + '\n\n';
+    }
+  });
+
+  return result.trim();
+}
+
+
 function populateFromData(data) {
   if (!data) return;
   studentNameInput.value = data.meta?.student || '';
   monthNameInput.value = data.meta?.month || '';
   teacherNameInput.value = data.meta?.teacher || '';
   if (data.meta?.title) document.getElementById('main-title').textContent = data.meta.title;
+
+
+  // Fill monthly bubble using daily bubbles
+const collected = collectAllDailyComments(data);
+
+// Only auto-fill if teacher did not manually write
+if (!data.monthlyComment || data.monthlyComment.trim() === '') {
+  monthlyCommentText.value = collected;
+}
+
+
+  if (data.monthlyComment !== undefined) {
+  monthlyCommentText.value = data.monthlyComment;
+}
+
 
   for (let w = 1; w <= 4; w++) {
     const weekArray = data.weeks?.[`week${w}`] || [];
