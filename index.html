@@ -1,25 +1,25 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>تقويم الطّالب الشهري</title>
+  <title id="pageTitle">تقويم الطّالب الشهري</title>
+
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* helper (move to style.css if you want) */
-    body { direction: rtl; }
+    /* small helpers (kept minimal; you can move to style.css) */
+    body { direction: rtl; font-family: 'Tajawal', sans-serif; }
     .mode-buttons { display:flex; gap:8px; justify-content:center; margin:12px 0; }
     .mode-buttons button { padding:6px 10px; border-radius:8px; border:none; background:#111; color:#fff; cursor:pointer; font-weight:700; }
   </style>
 </head>
 <body>
   <header class="topbar">
-    
     <div class="left">
-  <img src="images/logo.png" alt="شعار الموقع" style="height:100px; object-fit:contain;">
-  </div>
+      <img src="images/logo.png" alt="شعار الموقع" style="height:100px; object-fit:contain;">
+    </div>
 
     <div class="title-area"><h1 id="main-title">تقويم طالب العلم</h1></div>
 
@@ -29,9 +29,9 @@
       <input id="teacherName" class="top-input" placeholder="الشيخ" />
 
       <div class="top-buttons">
-        <button id="openBtn">فتح نقاط الطالب</button>
-        <button id="saveBtn">حفظ بيانات الطالب</button>
-        <button id="presentBtn">يعرض على</button>
+        <button id="openBtn" type="button">فتح نقاط الطالب</button>
+        <button id="saveBtn" type="button">حفظ بيانات الطالب</button>
+        <button id="presentBtn" type="button">يعرض على</button>
         <input id="fileInput" type="file" accept="application/json" style="display:none" />
       </div>
     </div>
@@ -57,21 +57,21 @@
 
     <div class="tablefornav">
       <div class="week-navigation">
-        <button id="prevWeekBtn">السّابق</button>
+        <button id="prevWeekBtn" type="button">السّابق</button>
         <span id="currentWeekLabel" style="font-weight:bold; margin: 0 10px;">الأسبوع 1</span>
-        <button id="nextWeekBtn">التالي</button>
+        <button id="nextWeekBtn" type="button">التالي</button>
       </div>
 
       <div class="mode-buttons">
-        <button id="useFullTableBtn">طالب داخلي  </button>
-        <button id="useThreeReqBtn">  طالب خارجي </button>
+        <button id="useFullTableBtn" type="button">طالب داخلي</button>
+        <button id="useThreeReqBtn" type="button">طالب خارجي</button>
       </div>
 
-      <div class="monthly-comment-bar">
-        <button id="monthlyCommentBtn" class="student-work-behavor">ماذا فعل الطّالب</button>
+      <div class="monthly-comment-bar" style="display:flex; justify-content:flex-start; margin:12px 0;">
+        <button id="monthlyCommentBtn" class="student-work-behavor" type="button">ماذا فعل الطّالب</button>
       </div>
 
-      <div id="monthlyCommentBubble" class="monthly-bubble hidden">
+      <div id="monthlyCommentBubble" class="monthly-bubble hidden" aria-hidden="true">
         <textarea id="monthlyCommentText" placeholder="اكتب ماذا فعل الطالب خلال الشهر..."></textarea>
       </div>
 
@@ -82,7 +82,7 @@
 
     <section class="extras">
       <div class="extra-card">
-        <h3>السّرد </h3>
+        <h3>السّرد</h3>
         <div class="req6">
           <label>نقطة السّرد</label>
           <input id="req6_mark" class="small-input" placeholder="النّقطة" />
@@ -90,7 +90,7 @@
       </div>
 
       <div class="extra-card">
-        <h3>الخدمة الأسبوعية </h3>
+        <h3>الخدمة الأسبوعية</h3>
         <div class="req7">
           <label>اختر حالة الخدمة لكل أسبوع (جيد / سيء)</label>
 
@@ -98,28 +98,28 @@
             <div class="req7-label">الأسبوع الأوّل</div>
             <input data-req7="0" class="req7-input" id="req7_1" placeholder="جيد أو سيء" />
             <button type="button" class="req7-btn good weekly-service-input" data-set="جيد" data-for="req7_1">جيد</button>
-            <button type="button" class="req7-btn bad weekly-service-input"  data-set="سيء" data-for="req7_1">سيء</button>
+            <button type="button" class="req7-btn bad weekly-service-input" data-set="سيء" data-for="req7_1">سيء</button>
           </div>
 
           <div class="req7-row">
             <div class="req7-label">الأسبوع الثّاني</div>
             <input data-req7="1" class="req7-input" id="req7_2" placeholder="جيد أو سيء" />
             <button type="button" class="req7-btn good weekly-service-input" data-set="جيد" data-for="req7_2">جيد</button>
-            <button type="button" class="req7-btn bad weekly-service-input"  data-set="سيء" data-for="req7_2">سيء</button>
+            <button type="button" class="req7-btn bad weekly-service-input" data-set="سيء" data-for="req7_2">سيء</button>
           </div>
 
           <div class="req7-row">
             <div class="req7-label">الأسبوع الثّالث</div>
             <input data-req7="2" class="req7-input" id="req7_3" placeholder="جيد أو سيء" />
             <button type="button" class="req7-btn good weekly-service-input" data-set="جيد" data-for="req7_3">جيد</button>
-            <button type="button" class="req7-btn bad weekly-service-input"  data-set="سيء" data-for="req7_3">سيء</button>
+            <button type="button" class="req7-btn bad weekly-service-input" data-set="سيء" data-for="req7_3">سيء</button>
           </div>
 
           <div class="req7-row">
             <div class="req7-label">الأسبوع الرّابع</div>
             <input data-req7="3" class="req7-input" id="req7_4" placeholder="جيد أو سيء" />
             <button type="button" class="req7-btn good weekly-service-input" data-set="جيد" data-for="req7_4">جيد</button>
-            <button type="button" class="req7-btn bad weekly-service-input"  data-set="سيء" data-for="req7_4">سيء</button>
+            <button type="button" class="req7-btn bad weekly-service-input" data-set="سيء" data-for="req7_4">سيء</button>
           </div>
         </div>
       </div>
@@ -127,9 +127,9 @@
 
     <section class="results">
       <div class="buttons-row">
-        <button id="calcAllWeeks">حساب معدّل كلّ اسبوع</button>
-        <button id="calcMonthly">حساب معدّل الطّالب الدّاخلي</button>
-        <button id="calc3Req">حساب معدّل الطّالب الخارجي </button>
+        <button id="calcAllWeeks" type="button">حساب معدّل كلّ اسبوع</button>
+        <button id="calcMonthly" type="button">حساب معدّل الطّالب الدّاخلي</button>
+        <button id="calc3Req" type="button">حساب معدّل الطّالب الخارجي</button>
       </div>
 
       <div class="output-row">
@@ -149,12 +149,12 @@
   <!-- Present circle -->
   <div id="presentCircle" class="present-circle hidden" aria-hidden="true">
     <div class="present-inner">
-      <button id="closePresent" class="present-close" title="أغلق">×</button>
+      <button id="closePresent" class="present-close" title="أغلق" type="button">×</button>
       <h4 style="margin-bottom:6px;">يعرض على</h4>
       <input id="present_line1" placeholder="يعرض على" />
       <input id="present_line2" placeholder="يعرض عليه" />
       <div style="margin-top:8px; display:flex; gap:8px; justify-content:center;">
-        <button id="savePresentBtn">حفظ</button>
+        <button id="savePresentBtn" type="button">حفظ</button>
       </div>
     </div>
   </div>
