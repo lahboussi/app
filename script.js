@@ -530,6 +530,28 @@ function buildDataObject() {
   return data;
 }
 
+const prevWeekBtn = document.getElementById('prevWeekBtn');
+const nextWeekBtn = document.getElementById('nextWeekBtn');
+
+if (prevWeekBtn) {
+  prevWeekBtn.addEventListener('click', () => {
+    if (currentWeek > 1) {
+      currentWeek--;
+      showOnlyWeek(currentWeek, currentMode);
+    }
+  });
+}
+
+if (nextWeekBtn) {
+  nextWeekBtn.addEventListener('click', () => {
+    if (currentWeek < totalWeeks) {
+      currentWeek++;
+      showOnlyWeek(currentWeek, currentMode);
+    }
+  });
+}
+
+
 /* ---------- autosave ---------- */
 function autosaveToLocal() {
   try {
